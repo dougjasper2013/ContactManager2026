@@ -10,6 +10,32 @@
 
     require_once('database.php');
 
+    // Check for duplicate email
+    $queryContacts = '
+        SELECT firstName, lastName, emailAddress, phoneNumber, status, dob FROM contacts';
+
+    $statement = $db->prepare($queryContacts);
+    $statement->execute();
+    $contacts = $statement->fetchAll();
+    $statement->closeCursor();
+
+    foreach ($contacts as $contact) {
+        if ($email_address == $contact["emailAddress"]) {
+            $_SESSION["add_error"] = "Invalid data, Duplicate Email Address. Try again.";
+            $url = "error.php";
+            header("Location: " . $url);
+            die();  
+        }
+    }
+
+    if ($first_name == null || $last_name == null || $email_address == null ||
+        $phone_number == null || $dob == null) {
+            $_SESSION["add_error"] = "Invalid contact data, Check all fields and try again.";
+            $url = "error.php";
+            header("Location: " . $url);
+            die();  
+        }
+
     // Add Contact
 
     $query = 'INSERT INTO contacts (firstName, lastName, emailAddress, phoneNumber, status, dob) 
@@ -25,6 +51,9 @@
     $statement->execute();
     $statement->closeCursor();
 
-    
+    $_SESSION["fullName"] = $first_name . " " . $last_name;
+    $url = "add_confirmation.php";
+    header("Location: " . $url);
+    die();
 
 ?>
