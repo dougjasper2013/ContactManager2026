@@ -7,12 +7,16 @@
     $phone_number = filter_input(INPUT_POST, 'phone_number');
     $status = filter_input(INPUT_POST, 'status');
     $dob = filter_input(INPUT_POST, 'dob');
+    $image = $_FILES['image'];
 
     require_once('database.php');
+    require_once('image_util.php');
+
+    $base_dir = 'images/';
 
     // Check for duplicate email
     $queryContacts = '
-        SELECT firstName, lastName, emailAddress, phoneNumber, status, dob FROM contacts';
+        SELECT firstName, lastName, emailAddress, phoneNumber, status, dob, imageName FROM contacts';
 
     $statement = $db->prepare($queryContacts);
     $statement->execute();
