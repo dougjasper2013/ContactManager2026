@@ -7,7 +7,7 @@
     $phone_number = filter_input(INPUT_POST, 'phone_number');
     $status = filter_input(INPUT_POST, 'status');
     $dob = filter_input(INPUT_POST, 'dob');
-    $image = $_FILES['image'];
+    $image = $_FILES['file1'];   
 
     require_once('database.php');
     require_once('image_util.php');
@@ -42,7 +42,33 @@
 
     $image_name = ''; // default empty
 
-    // ******* More Code to come for Image here tomorrow *******
+    // ******* Image Upload *******
+
+    if ($image && $image['error'] == UPLOAD_ERR_OK) {
+        // process new image
+        $original_filename = basename($image['name']);
+        $upload_path = $base_dir . $original_filename;
+        move_uploaded_file($image['tmp_name'], $upload_path);
+
+        process_image($base_dir, $original_filename);
+
+        // save _100 version in DB
+        $dot_pos = strpos($original_filename, '.');
+        $name_100 = substr($original_filename, 0, $dot_pos) . '_100' . substr($original_filename, $dot_pos);
+        $image_name = $name_100;
+    }
+    else {
+        // Use placeholder
+        $placeholder = 'placeholder.jpg';
+        $placeholder_100 = 'placeholder_100.jpg';
+        $placeholder_400 = 'placeholder_400.jpg';
+
+        if (!file_exists($base_dir . $placeholder_100) || !file_exists($base_dir . $placeholder_400)) {
+            process_image($base_dir, $placeholder);
+        }
+
+        $image_name = $placeholder_100;
+    }
 
     // Add Contact
 
